@@ -42,8 +42,12 @@ pcfg() {
     ram-a76)      echo 512 ;;                  ram-r52)    echo 256 ;;
     # cross-compile triple + ISA switch per profile:
     #   a76 -> AArch64 (64-bit);  r52 -> AArch32 Thumb (R52 boots in Thumb state)
+    #   r52 + "-mfpu=none": clang KHONG sinh VFP/NEON. Ly do: (1) port
+    #   ARM_CRx_No_GIC khong luu FP-SIMD khi doi task, (2) QEMU cortex-r52
+    #   tren mps3-an536 tra Undefined Instruction cho vdup/vst (xem app_main.c).
+    #   Neu bo -mfpu=none thi phai bat CPACR.CP10|CP11 (app_main.c da lam).
     triple-a76)   echo aarch64-none-elf ;;     triple-r52) echo arm-none-eabi ;;
-    thumb-a76)    echo "" ;;                   thumb-r52)  echo -mthumb -march=armv7-a ;;
+    thumb-a76)    echo "" ;;                   thumb-r52)  echo -mthumb -march=armv7-a -mfpu=none ;;
     *) echo "pcfg: unknown key '$1'" >&2; return 2 ;;
   esac
 }
